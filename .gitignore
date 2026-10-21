@@ -1,0 +1,22 @@
+# Zugangsdaten – niemals ins Repo
+config.php
+.env
+*.env
+sftp.json
+.vscode/sftp.json
+
+# Hochgeladene Dateien aus dem CMS (liegen nur auf dem Server)
+uploads/
+
+# Original-Arbeitsdateien (zu gross, gehören nicht ins Repo)
+*.procreate
+*.psd
+*.ai
+*.indd
+*.aep
+*.prproj
+
+# System-Dateien
+.DS_Store
+Thumbs.db
+desktop.ini
