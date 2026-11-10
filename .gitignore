@@ -20,3 +20,6 @@ uploads/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Original-Zeichnungen (nur lokal, fuer die Webseite gibt es verkleinerte Versionen)
+zeichnungen/
