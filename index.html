@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leo Pfyl – Zeichnungen, Animationen, Plakate</title>
+  <meta name="description" content="Das Skizzenbuch von Leo Pfyl: Illustrationen, Animationen, Plakate und Webdesign.">
+  <link rel="icon" href="assets/img/marke/logo.png">
+  <link rel="preload" href="assets/fonts/permanent-marker.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Filter fuer den "Line Boil": Linien zittern leicht wie in einer gezeichneten Animation -->
+  <svg class="filter" aria-hidden="true">
+    <filter id="boil-0"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+    <filter id="boil-1"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+    <filter id="boil-2"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="13"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+  </svg>
+
+  <!-- Register-Laschen: die Navigation ragt rechts aus dem Skizzenbuch -->
+  <nav class="register" aria-label="Hauptnavigation">
+    <a class="lasche" href="#vorne">Vorne</a>
+    <a class="lasche" href="#zeug">Zeug</a>
+    <a class="lasche" href="#ich">Ich</a>
+    <a class="lasche" href="#post">Post</a>
+  </nav>
+
+  <main class="seite">
+
+    <!-- Startseite: der Name zeichnet sich selbst -->
+    <section id="vorne" class="vorne">
+      <h1 class="schriftzug">
+        <canvas class="schriftzug__canvas" width="1000" height="662" aria-hidden="true"></canvas>
+        <span class="sr-only">Leo Pfyl</span>
+      </h1>
+      <p class="vorne__untertitel">zeichnet, animiert, macht Plakate&nbsp;– und manchmal auch Webseiten.</p>
+
+      <img class="doodle" src="assets/img/deko/doodle-stern.png" alt="" style="--x: 12%; --y: 18%; --r: -12deg; --w: 70px">
+      <img class="doodle" src="assets/img/deko/doodle-rakete.png" alt="" style="--x: 82%; --y: 14%; --r: 18deg; --w: 60px">
+      <img class="doodle" src="assets/img/deko/doodle-blitz.png" alt="" style="--x: 86%; --y: 74%; --r: 8deg; --w: 50px">
+      <img class="doodle" src="assets/img/deko/doodle-kirschen.png" alt="" style="--x: 6%; --y: 80%; --r: -6deg; --w: 70px">
+
+      <a class="scroll-hinweis" href="#zeug">
+        <img src="assets/img/deko/pfeil-kringel-2.png" alt="">
+        <span>runter&nbsp;scrollen</span>
+      </a>
+    </section>
+
+    <!-- Wäscheleine mit den besten Arbeiten (kommt im naechsten Schritt) -->
+    <section id="zeug" class="abschnitt">
+      <h2 class="notiz">Frisch aus dem Heft</h2>
+      <p class="platzhalter">Hier kommt die Wäscheleine mit den besten Arbeiten hin.</p>
+      <a class="knopf" href="#zeug">Mehr Zeug</a>
+    </section>
+
+    <!-- Daumenkino (kommt spaeter) -->
+    <section id="daumenkino" class="abschnitt">
+      <p class="platzhalter">Hier kommt das Daumenkino hin.</p>
+    </section>
+
+    <!-- Über mich -->
+    <section id="ich" class="abschnitt ich">
+      <h2 class="notiz">Das bin ich (in echt)</h2>
+      <figure class="foto">
+        <img src="assets/img/foto/leo.jpg" alt="Foto von Leo Pfyl" width="900" height="960">
+        <img class="foto__klebeband" src="assets/img/deko/klebeband-2.png" alt="">
+      </figure>
+      <div class="ich__text">
+        <p>Hoi, ich bin Leo. Ich zeichne eigentlich ständig&nbsp;– und irgendwann fangen die Zeichnungen an, sich zu bewegen.</p>
+        <p class="platzhalter">Hier kommt noch ein bisschen mehr über dich hin.</p>
+      </div>
+    </section>
+
+    <!-- Kontakt -->
+    <section id="post" class="abschnitt">
+      <h2 class="notiz">Schreib mir was rein</h2>
+      <p class="platzhalter">Hier kommt das Kontaktformular hin.</p>
+    </section>
+
+  </main>
+
+  <footer class="fuss">
+    <img class="fuss__figur" src="assets/img/figuren/zeichnend.png" alt="Leo sitzt da und zeichnet">
+    <div class="fuss__text">
+      <p>Diese Seite wurde von Hand gezeichnet.</p>
+      <div class="socials">
+        <a href="https://www.instagram.com/" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
+        <a href="https://www.linkedin.com/" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
+      </div>
+      <p class="fuss__klein">© 2026 Leo Pfyl</p>
+    </div>
+  </footer>
+
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

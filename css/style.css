@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Skizzenbuch – Grundgerüst
+   ========================================================================== */
+
+@font-face {
+  font-family: "Marker";
+  src: url("../assets/fonts/permanent-marker.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Karla";
+  src: url("../assets/fonts/karla-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Karla";
+  src: url("../assets/fonts/karla-700.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --papier: #fdfcf7;
+  --tusche: #1a1a1a;
+  --rot: #e0322b;
+  --linie: #c9d6e3;          /* Heftlinien */
+  --zeile: 2rem;             /* Abstand der Heftlinien = Zeilenhöhe */
+  --rand: clamp(3rem, 8vw, 7rem);   /* Position des roten Randstrichs */
+  --register-breite: 7.5rem;
+
+  --schrift-hand: "Marker", "Comic Sans MS", cursive;
+  --schrift-text: "Karla", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: #e9e4d8;        /* Tisch, auf dem das Skizzenbuch liegt */
+  color: var(--tusche);
+  font-family: var(--schrift-text);
+  font-size: 1.125rem;
+  line-height: var(--zeile);
+}
+
+img { max-width: 100%; display: block; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.filter { position: absolute; width: 0; height: 0; }
+
+/* ---------- Die Seite: liniertes Papier mit rotem Rand ---------- */
+
+.seite {
+  position: relative;
+  margin-right: var(--register-breite);
+  min-height: 100vh;
+  padding-left: calc(var(--rand) + 2rem);
+  padding-right: 2rem;
+  background-color: var(--papier);
+  background-image:
+    linear-gradient(90deg, transparent calc(var(--rand) - 1px), var(--rot) calc(var(--rand) - 1px),
+                    var(--rot) calc(var(--rand) + 1px), transparent calc(var(--rand) + 1px)),
+    repeating-linear-gradient(to bottom, transparent 0 calc(var(--zeile) - 1px),
+                              var(--linie) calc(var(--zeile) - 1px) var(--zeile));
+  /* rechter Rand des Buches: ein paar Seiten, die darunter liegen */
+  box-shadow:
+    1px 0 0 #e6e1d3,
+    3px 0 0 var(--papier), 4px 0 0 #e1dccd,
+    6px 0 0 var(--papier), 7px 0 0 #dcd6c6,
+    12px 0 24px rgb(0 0 0 / 0.12);
+}
+
+.abschnitt {
+  min-height: 60vh;
+  padding: calc(var(--zeile) * 3) 0;
+}
+
+/* ---------- Register-Laschen ---------- */
+
+.register {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--register-breite);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  z-index: 10;
+}
+
+.lasche {
+  --farbe: #f6f1e4;
+  position: relative;
+  display: block;
+  width: calc(var(--register-breite) + 1rem);
+  margin-left: -1rem;          /* steckt ein Stück unter der Seite */
+  padding: 0.9rem 1rem 0.9rem 1.75rem;
+  background: var(--farbe);
+  border: 2px solid var(--tusche);
+  border-left: none;
+  border-radius: 0 14px 18px 0 / 0 22px 14px 0;
+  color: var(--tusche);
+  font-family: var(--schrift-hand);
+  font-size: 1.15rem;
+  text-decoration: none;
+  transform: translateX(-0.75rem) rotate(var(--kipp, 0deg));
+  /* nur transform animieren: eine Farb-Animation unter dem SVG-Filter wird in Chrome nicht neu gezeichnet */
+  transition: transform 0.35s cubic-bezier(.3, 1.6, .5, 1);
+  filter: url(#boil-0);
+}
+.lasche:nth-child(1) { --farbe: #fbe3df; --kipp: -1.5deg; }
+.lasche:nth-child(2) { --farbe: #fff6c8; --kipp: 1deg; }
+.lasche:nth-child(3) { --farbe: #dff0e4; --kipp: -0.5deg; }
+.lasche:nth-child(4) { --farbe: #e2ebf7; --kipp: 1.5deg; }
+
+.lasche:hover,
+.lasche:focus-visible { transform: translateX(0) rotate(0deg); }
+
+.lasche.ist-aktiv {
+  background: var(--rot);
+  color: var(--papier);
+  transform: translateX(0) rotate(0deg);
+}
+
+/* ---------- Handschrift-Elemente ---------- */
+
+.notiz {
+  display: inline-block;
+  margin: 0 0 var(--zeile);
+  font-family: var(--schrift-hand);
+  font-weight: 400;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: calc(var(--zeile) * 2);
+  transform: rotate(-1.5deg);
+  position: relative;
+}
+/* rote Wellenlinie unter jeder Notiz – gezeichnet von Leo, eingefärbt per CSS */
+.notiz::after {
+  content: "";
+  position: absolute;
+  left: -0.25em;
+  right: -0.25em;
+  bottom: -0.4em;
+  height: 0.6em;
+  background: var(--rot);
+  -webkit-mask: url("../assets/img/deko/unterstrich-welle.png") center / 100% 100% no-repeat;
+          mask: url("../assets/img/deko/unterstrich-welle.png") center / 100% 100% no-repeat;
+}
+
+.platzhalter {
+  color: #8a8a8a;
+  font-style: italic;
+}
+
+/* ---------- Gezeichneter Knopf ---------- */
+
+.knopf {
+  display: inline-block;
+  padding: 0.6rem 1.6rem;
+  border: 2.5px solid var(--tusche);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  color: var(--tusche);
+  font-family: var(--schrift-hand);
+  font-size: 1.2rem;
+  text-decoration: none;
+  /* Schraffur, die beim Hover "ausgemalt" wird */
+  background-image: repeating-linear-gradient(-45deg, var(--rot) 0 2px, transparent 2px 7px);
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.45s steps(6);
+  filter: url(#boil-0);
+}
+.knopf:hover,
+.knopf:focus-visible { background-size: 100% 100%; }
+
+/* ---------- Startseite ---------- */
+
+.vorne {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.schriftzug { margin: 0; width: min(80%, 900px); }
+.schriftzug__canvas { width: 100%; height: auto; }
+
+.vorne__untertitel {
+  margin: var(--zeile) 0 0;
+  font-size: 1.25rem;
+  opacity: 0;              /* wird nach dem Schriftzug eingeblendet */
+}
+
+.doodle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  transform: rotate(var(--r));
+  filter: url(#boil-0);
+  opacity: 0;
+}
+
+.scroll-hinweis {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  color: var(--tusche);
+  font-family: var(--schrift-hand);
+  text-decoration: none;
+  opacity: 0;
+}
+.scroll-hinweis img { width: 48px; transform: rotate(150deg); filter: url(#boil-0); }
+
+/* ---------- Über mich ---------- */
+
+.ich {
+  display: grid;
+  grid-template-columns: minmax(200px, 340px) 1fr;
+  grid-template-areas: "titel titel" "foto text";
+  gap: var(--zeile) 3rem;
+  align-items: start;
+}
+.ich .notiz { grid-area: titel; justify-self: start; }
+
+.foto {
+  grid-area: foto;
+  position: relative;
+  margin: 0;
+  padding: 0.6rem 0.6rem 2.5rem;
+  background: #fff;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.15);
+  transform: rotate(-3deg);
+}
+.foto__klebeband {
+  position: absolute;
+  top: -2.25rem;
+  left: 50%;
+  width: 110px;
+  transform: translateX(-50%) rotate(8deg);
+}
+.ich__text { grid-area: text; max-width: 38rem; }
+
+/* ---------- Footer ---------- */
+
+.fuss {
+  margin-right: var(--register-breite);
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+  padding: 3rem calc(var(--rand) + 2rem) 2rem;
+}
+.fuss__figur { width: 200px; filter: url(#boil-0); }
+.fuss__text p { margin: 0 0 0.5rem; }
+.fuss__klein { font-size: 0.9rem; color: #555; }
+
+.socials { display: flex; gap: 1rem; margin: 1rem 0; }
+.socials img { width: 44px; transition: transform 0.25s cubic-bezier(.3, 1.6, .5, 1); }
+.socials a:hover img { transform: rotate(-10deg) scale(1.15); }
+
+/* ---------- Kleine Bildschirme ---------- */
+
+@media (max-width: 700px) {
+  :root { --register-breite: 0rem; --rand: 2rem; }
+
+  .register {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.25rem;
+    background: var(--papier);
+    border-top: 2px solid var(--tusche);
+  }
+  .lasche {
+    width: auto;
+    margin: 0;
+    padding: 0.5rem 0.9rem;
+    border: 2px solid var(--tusche);
+    border-top: none;
+    border-radius: 0 0 14px 18px;
+    transform: rotate(var(--kipp, 0deg));
+  }
+
+  .ich { grid-template-columns: 1fr; grid-template-areas: "titel" "foto" "text"; }
+  .foto { max-width: 280px; }
+
+  .fuss { flex-direction: column; align-items: flex-start; padding-bottom: 5rem; }
+}

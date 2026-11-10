@@ -23,3 +23,6 @@ desktop.ini
 
 # Original-Zeichnungen (nur lokal, fuer die Webseite gibt es verkleinerte Versionen)
 zeichnungen/
+
+# Lokale Einstellungen von Claude
+.claude/
