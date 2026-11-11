@@ -6,7 +6,11 @@
     "kategorie": "Animation",
     "jahr": 2026,
     "bild": "assets/img/daumenkino/nase/062.png",
-    "leine": true
+    "leine": true,
+    "beschreibung": "Platzhalter: Eine Figur schnüffelt herum, bis ihre Nase so gross wird, dass sie einfach abploppt und davonrennt. Frame by Frame in Procreate gezeichnet.",
+    "tools": "Procreate",
+    "bilder": ["assets/img/daumenkino/nase/020.png", "assets/img/daumenkino/nase/075.png", "assets/img/daumenkino/nase/090.png"],
+    "skizzen": ["assets/img/daumenkino/nase/045.png"]
   },
   {
     "slug": "glas",
@@ -15,7 +19,10 @@
     "kategorie": "Animation",
     "jahr": 2026,
     "bild": "assets/img/daumenkino/glas/055.png",
-    "leine": true
+    "leine": true,
+    "beschreibung": "Platzhalter: Wieder die Nase – diesmal zieht sie die ganze Figur hinter sich her, direkt gegen ein Glas mit einer Blume.",
+    "tools": "Procreate",
+    "bilder": ["assets/img/daumenkino/glas/020.png", "assets/img/daumenkino/glas/065.png"]
   },
   {
     "slug": "hallo",
@@ -24,7 +31,10 @@
     "kategorie": "Illustration",
     "jahr": 2026,
     "bild": "assets/img/figuren/hallo/003.png",
-    "leine": true
+    "leine": true,
+    "beschreibung": "Platzhalter: Selbstporträt als Figur – in drei Posen für diese Webseite.",
+    "tools": "Procreate",
+    "bilder": ["assets/img/figuren/zeigend.png", "assets/img/figuren/zeichnend.png"]
   },
   {
     "slug": "kacke",
@@ -33,7 +43,10 @@
     "kategorie": "Animation",
     "jahr": 2026,
     "bild": "assets/img/daumenkino/kacke/040.png",
-    "leine": true
+    "leine": true,
+    "beschreibung": "Platzhalter: Ein Vogel trifft, die Figur explodiert vor Wut und wird dabei immer grösser.",
+    "tools": "Procreate",
+    "bilder": ["assets/img/daumenkino/kacke/010.png", "assets/img/daumenkino/kacke/065.png"]
   },
   {
     "slug": "zeichnen",
@@ -42,7 +55,9 @@
     "kategorie": "Illustration",
     "jahr": 2026,
     "bild": "assets/img/figuren/zeichnend.png",
-    "leine": true
+    "leine": true,
+    "beschreibung": "Platzhalter: So sehe ich aus, wenn ich zeichne.",
+    "tools": "Procreate"
   },
   {
     "slug": "logo",
@@ -51,6 +66,9 @@
     "kategorie": "Plakate",
     "jahr": 2026,
     "bild": "assets/img/marke/logo.png",
-    "leine": true
+    "leine": true,
+    "beschreibung": "Platzhalter: Mein Logo und mein Schriftzug, beide von Hand gezeichnet.",
+    "tools": "Procreate, Illustrator",
+    "auftraggeber": "mich selbst"
   }
 ]

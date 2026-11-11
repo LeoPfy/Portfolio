@@ -75,7 +75,7 @@ async function waescheleine() {
   const spur = leine.querySelector(".leine__spur");
   const seil = leine.querySelector(".leine__seil path");
 
-  const projekte = (await fetch("data/projekte.json").then((r) => r.json())).filter((p) => p.leine);
+  const projekte = (await ladeProjekte()).filter((p) => p.leine);
 
   const ABSTAND = 240;        // Abstand zwischen den Karten
   const DURCHHANG = 70;       // wie tief die Leine in der Mitte hängt
@@ -86,7 +86,7 @@ async function waescheleine() {
     li.className = "karte";
     li.innerHTML = `
       <img class="karte__klammer" src="assets/img/deko/klammer-${(i % 2) + 1}.png" alt="">
-      <a href="#zeug" draggable="false">
+      <a href="projekt.html?p=${p.slug}" draggable="false">
         <img class="karte__bild" src="${p.bild}" alt="" draggable="false">
         <span class="karte__titel">${p.titel}</span>
         <span class="karte__notiz">${p.notiz}</span>
@@ -269,8 +269,9 @@ function daumenkinos() {
 // ---------- Aktive Register-Lasche ----------
 // Die Lasche des Abschnitts, der gerade zu sehen ist, wird rot.
 function aktiveLasche() {
-  const laschen = document.querySelectorAll(".lasche");
-  const abschnitte = [...laschen].map((l) => document.querySelector(l.getAttribute("href")));
+  const laschen = [...document.querySelectorAll(".lasche")];
+  const idVon = (l) => l.dataset.abschnitt || l.getAttribute("href").replace("#", "");
+  const abschnitte = laschen.map((l) => document.getElementById(idVon(l)));
 
   // Aktiv ist der letzte Abschnitt, dessen Anfang schon über der Bildschirmmitte liegt
   function aktualisieren() {
@@ -278,14 +279,234 @@ function aktiveLasche() {
     abschnitte.forEach((a) => {
       if (a && a.getBoundingClientRect().top < innerHeight / 2) aktiv = a;
     });
-    laschen.forEach((l) => l.classList.toggle("ist-aktiv", l.getAttribute("href") === `#${aktiv.id}`));
+    laschen.forEach((l) => l.classList.toggle("ist-aktiv", idVon(l) === aktiv.id));
   }
   addEventListener("scroll", aktualisieren, { passive: true });
   aktualisieren();
 }
 
+// ---------- Projektdaten ----------
+// Alle Projekte stehen in data/projekte.json (später vom CMS gepflegt).
+let projektCache = null;
+function ladeProjekte() {
+  projektCache ??= fetch("data/projekte.json").then((r) => r.json());
+  return projektCache;
+}
+
+// Text sicher ins HTML einsetzen (keine Sonderzeichen-Überraschungen)
+function sicher(text = "") {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Kleine Zufallsschräglage, aber für jedes Projekt immer gleich
+function schraeglage(slug, max = 3) {
+  let h = 0;
+  for (const z of slug) h = (h * 31 + z.charCodeAt(0)) % 1000;
+  return ((h / 1000) * 2 - 1) * max;
+}
+
+// ---------- Projekte-Seite: eingeklebte Karten + Filter ----------
+async function projektListe() {
+  const liste = document.querySelector(".zeug__liste");
+  const reiter = document.querySelector(".filter-reiter");
+  const leer = document.querySelector(".zeug__leer");
+  const projekte = await ladeProjekte();
+
+  projekte.forEach((p, i) => {
+    const li = document.createElement("li");
+    li.className = "zettel";
+    li.dataset.kategorie = p.kategorie;
+    li.style.setProperty("--r", `${schraeglage(p.slug)}deg`);
+    li.innerHTML = `
+      <a href="projekt.html?p=${encodeURIComponent(p.slug)}">
+        <span class="eingeklebt zettel__bild">
+          <img class="klebeband" src="assets/img/deko/klebeband-${(i % 3) + 1}.png" alt="">
+          <img src="${p.bild}" alt="" loading="lazy">
+        </span>
+        <span class="zettel__titel">${sicher(p.titel)}</span>
+        <span class="zettel__notiz">${sicher(p.notiz)} · ${p.jahr}</span>
+      </a>`;
+    liste.append(li);
+  });
+
+  // Filter-Knöpfe aus den vorhandenen Kategorien
+  const kategorien = ["Alles", ...new Set(projekte.map((p) => p.kategorie))];
+  kategorien.forEach((k) => {
+    const anzahl = k === "Alles" ? projekte.length : projekte.filter((p) => p.kategorie === k).length;
+    const knopf = document.createElement("button");
+    knopf.type = "button";
+    knopf.className = "filter-reiter__knopf";
+    knopf.dataset.kategorie = k;
+    knopf.setAttribute("aria-pressed", k === "Alles");
+    knopf.innerHTML = `${k} <span class="filter-reiter__anzahl">${anzahl}</span>`;
+    reiter.append(knopf);
+  });
+
+  // Gewählte Kategorie auch in der Adresse merken (?kategorie=Animation)
+  const start = new URLSearchParams(location.search).get("kategorie");
+  if (start && kategorien.includes(start)) filtern(start, false);
+
+  reiter.addEventListener("click", (e) => {
+    const knopf = e.target.closest("button");
+    if (knopf) filtern(knopf.dataset.kategorie, true);
+  });
+
+  function filtern(kategorie, animiert) {
+    reiter.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.kategorie === kategorie));
+    const url = new URL(location);
+    kategorie === "Alles" ? url.searchParams.delete("kategorie") : url.searchParams.set("kategorie", kategorie);
+    history.replaceState(null, "", url);
+
+    const zettel = [...liste.children];
+    const zustand = animiert ? Flip.getState(zettel) : null;
+    zettel.forEach((z) => (z.hidden = kategorie !== "Alles" && z.dataset.kategorie !== kategorie));
+    leer.hidden = zettel.some((z) => !z.hidden);
+
+    // Flip: Karten rutschen an ihren neuen Platz, neue ploppen rein, alte schrumpfen weg
+    if (zustand) {
+      Flip.from(zustand, {
+        duration: 0.6,
+        ease: "power3.inOut",
+        stagger: 0.03,
+        absolute: true,
+        onEnter: (el) => gsap.fromTo(el, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }),
+        onLeave: (el) => gsap.to(el, { opacity: 0, scale: 0.6, duration: 0.3 }),
+      });
+    }
+  }
+}
+
+// ---------- Projekt-Detailseite ----------
+async function projektDetail() {
+  const projekte = await ladeProjekte();
+  const slug = new URLSearchParams(location.search).get("p");
+  const index = projekte.findIndex((p) => p.slug === slug);
+  const seite = document.querySelector(".projekt");
+
+  if (index < 0) {
+    seite.querySelector(".projekt__titel").textContent = "Hoppla, das gibt’s nicht";
+    seite.querySelector(".projekt__text").innerHTML = '<p>Dieses Projekt ist nicht (mehr) im Heft. <a href="projekte.html">Zurück zum Zeug</a></p>';
+    seite.querySelector(".projekt__hauptbild").hidden = true;
+    seite.querySelector(".naechstes").hidden = true;
+    return;
+  }
+
+  const p = projekte[index];
+  document.title = `${p.titel} – Leo Pfyl`;
+  seite.querySelector(".projekt__titel").textContent = p.titel;
+  seite.querySelector(".projekt__notiz").textContent = p.notiz;
+
+  // Infos: nur anzeigen, was vorhanden ist
+  const infos = { Jahr: p.jahr, Kategorie: p.kategorie, Tools: p.tools, "Für": p.auftraggeber };
+  seite.querySelector(".projekt__infos").innerHTML = Object.entries(infos)
+    .filter(([, wert]) => wert)
+    .map(([name, wert]) => `<div><dt>${name}</dt><dd>${sicher(String(wert))}</dd></div>`)
+    .join("");
+
+  // Hauptbild oder Video
+  const haupt = seite.querySelector(".projekt__hauptbild");
+  haupt.insertAdjacentHTML(
+    "beforeend",
+    p.video
+      ? `<video src="${p.video}" poster="${p.bild}" controls loop muted playsinline></video>`
+      : `<img src="${p.bild}" alt="${sicher(p.titel)}">`
+  );
+
+  seite.querySelector(".projekt__text").innerHTML = (p.beschreibung || "")
+    .split("\n")
+    .filter(Boolean)
+    .map((absatz) => `<p>${sicher(absatz)}</p>`)
+    .join("");
+
+  const galerie = (bilder) =>
+    bilder
+      .map((src, i) => `
+        <figure class="eingeklebt" style="--r: ${i % 2 ? 2 : -2}deg">
+          <img class="klebeband" src="assets/img/deko/klebeband-${(i % 3) + 1}.png" alt="">
+          <img src="${src}" alt="" loading="lazy">
+        </figure>`)
+      .join("");
+
+  seite.querySelector(".projekt > .projekt__galerie").innerHTML = galerie(p.bilder || []);
+  if (p.skizzen?.length) {
+    const skizzen = seite.querySelector(".projekt__skizzen");
+    skizzen.hidden = false;
+    skizzen.querySelector(".projekt__galerie").innerHTML = galerie(p.skizzen);
+  }
+
+  const naechstes = projekte[(index + 1) % projekte.length];
+  const link = seite.querySelector(".naechstes");
+  link.href = `projekt.html?p=${encodeURIComponent(naechstes.slug)}`;
+  link.querySelector(".naechstes__titel").textContent = naechstes.titel;
+}
+
+// ---------- Kritzel-Übergang ----------
+// Beim Wechsel auf eine andere Seite malt ein roter Kritzelstrich den
+// Bildschirm voll. Die neue Seite startet zugekritzelt und wird wieder frei.
+function uebergaenge() {
+  const pfad = document.querySelector(".uebergang path");
+
+  // Ankommen: Kritzel wegwischen
+  if (document.documentElement.classList.contains("kommt-an")) {
+    sessionStorage.removeItem("uebergang");
+    const frei = () => document.documentElement.classList.remove("kommt-an");
+    gsap.fromTo(pfad, { strokeDashoffset: 0 }, { strokeDashoffset: -1, duration: 0.7, ease: "power2.inOut", delay: 0.1, onComplete: frei });
+    setTimeout(frei, 1500);   // Sicherheitsnetz wie oben
+  }
+
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a");
+    if (!link || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const ziel = new URL(link.href, location);
+    // nur interne Links auf eine andere Seite (Sprünge auf derselben Seite scrollen normal)
+    if (ziel.origin !== location.origin || link.target === "_blank") return;
+    if (ziel.pathname === location.pathname && ziel.search === location.search) return;
+
+    e.preventDefault();
+    document.documentElement.classList.add("geht-weg");
+    let weg = false;
+    const los = () => {
+      if (weg) return;
+      weg = true;
+      try { sessionStorage.setItem("uebergang", "1"); } catch (_) {}
+      location.href = ziel.href;
+    };
+    gsap.fromTo(pfad, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.in", onComplete: los });
+    // Sicherheitsnetz: falls der Browser Animationen pausiert (z. B. Tab im Hintergrund)
+    setTimeout(los, 1000);
+  });
+
+  // Zurück-Knopf des Browsers: Seite aus dem Cache nicht zugekritzelt lassen
+  addEventListener("pageshow", (e) => {
+    if (e.persisted) {
+      document.documentElement.classList.remove("geht-weg", "kommt-an");
+      gsap.set(pfad, { strokeDashoffset: 1 });
+    }
+  });
+}
+
+// ---------- Start ----------
 lineBoil();
-waescheleine();
-daumenkinos();
-aktiveLasche();
-intro();
+uebergaenge();
+
+if (document.querySelector(".schriftzug")) {
+  waescheleine();
+  daumenkinos();
+  aktiveLasche();
+  intro();
+  // Sprung auf einen Abschnitt (z. B. index.html#post): erst springen,
+  // wenn ScrollTrigger die Daumenkinos fertig eingerichtet hat
+  if (location.hash) {
+    addEventListener("load", () => {
+      ScrollTrigger.refresh();
+      document.querySelector(location.hash)?.scrollIntoView({ behavior: "instant" });
+    });
+  }
+}
+if (document.querySelector(".zeug__liste")) {
+  gsap.registerPlugin(Flip);
+  projektListe();
+}
+if (document.querySelector(".projekt")) projektDetail();

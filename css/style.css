@@ -436,6 +436,180 @@ img { max-width: 100%; display: block; }
 .socials img { width: 44px; transition: transform 0.25s cubic-bezier(.3, 1.6, .5, 1); }
 .socials a:hover img { transform: rotate(-10deg) scale(1.15); }
 
+/* ---------- Kritzel-Übergang ---------- */
+
+.uebergang {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  pointer-events: none;
+  visibility: hidden;
+}
+.uebergang path {
+  fill: none;
+  stroke: var(--rot);
+  stroke-width: 22;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+html.kommt-an .uebergang,
+html.geht-weg .uebergang { visibility: visible; pointer-events: auto; }
+html.kommt-an .uebergang path { stroke-dashoffset: 0; }
+
+/* ---------- Eingeklebte Bilder (Klebeband oben) ---------- */
+
+.eingeklebt {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0.6rem;
+  background: #fff;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.13);
+  transform: rotate(var(--r, 0deg));
+}
+.eingeklebt > img:not(.klebeband),
+.eingeklebt > video { width: 100%; background: var(--papier); }
+.klebeband {
+  position: absolute;
+  top: -1.6rem;
+  left: 50%;
+  width: 90px;
+  transform: translateX(-50%) rotate(-6deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ---------- Projekte-Seite ---------- */
+
+.filter-reiter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 calc(var(--zeile) * 2);
+}
+.filter-reiter__knopf {
+  position: relative;
+  padding: 0.3rem 0.9rem;
+  border: none;
+  background: none;
+  color: var(--tusche);
+  font: inherit;
+  font-family: var(--schrift-hand);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.filter-reiter__anzahl { font-size: 0.8em; color: #888; }
+/* aktiver Filter: rot umkringelt mit Leos gezeichnetem Kreis */
+.filter-reiter__knopf::after {
+  content: "";
+  position: absolute;
+  inset: -0.35rem -0.6rem;
+  background: var(--rot);
+  -webkit-mask: url("../assets/img/deko/kreis-kurz.png") center / 100% 100% no-repeat;
+          mask: url("../assets/img/deko/kreis-kurz.png") center / 100% 100% no-repeat;
+  transform: scale(0.4) rotate(-20deg);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(.3, 1.6, .5, 1), opacity 0.2s;
+}
+.filter-reiter__knopf[aria-pressed="true"]::after { transform: none; opacity: 1; }
+.filter-reiter__knopf:hover::after { opacity: 0.35; transform: scale(0.9); }
+.filter-reiter__knopf[aria-pressed="true"]:hover::after { opacity: 1; transform: none; }
+
+.zeug__liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: calc(var(--zeile) * 2) 2.5rem;
+}
+.zettel a {
+  display: block;
+  color: var(--tusche);
+  text-decoration: none;
+  transform: rotate(var(--r));
+  transition: transform 0.35s cubic-bezier(.3, 1.6, .5, 1);
+}
+.zettel__bild { transition: box-shadow 0.3s; }
+.zettel__bild > img:not(.klebeband) { aspect-ratio: 4 / 5; object-fit: contain; }
+.zettel a:hover,
+.zettel a:focus-visible { transform: rotate(0deg) translateY(-8px); }
+.zettel a:hover .zettel__bild,
+.zettel a:focus-visible .zettel__bild { box-shadow: 0 16px 30px rgb(0 0 0 / 0.2); }
+.zettel a:focus-visible { outline: 3px solid var(--rot); outline-offset: 6px; }
+
+.zettel__titel {
+  display: block;
+  margin-top: 0.75rem;
+  font-family: var(--schrift-hand);
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+.zettel__notiz {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #555;
+}
+.zettel a:hover .zettel__titel { color: var(--rot); }
+
+/* ---------- Projekt-Detailseite ---------- */
+
+.zurueck,
+.naechstes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--tusche);
+  font-family: var(--schrift-hand);
+  text-decoration: none;
+}
+.zurueck { margin-bottom: var(--zeile); }
+.zurueck img { width: 34px; transform: rotate(-135deg); transition: transform 0.3s; }
+.zurueck:hover img { transform: rotate(-135deg) translateY(-6px); }
+
+.projekt__kopf { margin-bottom: calc(var(--zeile) * 2); }
+.projekt__notiz { margin: 0; font-size: 1.25rem; color: #555; }
+.projekt__infos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 2rem;
+  margin: var(--zeile) 0 0;
+}
+.projekt__infos dt { font-family: var(--schrift-hand); color: var(--rot); }
+.projekt__infos dd { margin: 0; }
+
+.projekt__hauptbild {
+  max-width: 820px;
+  margin-bottom: calc(var(--zeile) * 2);
+  --r: -1deg;
+}
+.projekt__hauptbild .klebeband--links { left: 6%; transform: rotate(-25deg); }
+.projekt__hauptbild .klebeband--rechts { left: auto; right: 6%; transform: rotate(22deg); }
+
+.projekt__text { max-width: 40rem; margin-bottom: calc(var(--zeile) * 2); }
+
+.projekt__galerie {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: calc(var(--zeile) * 2) 2.5rem;
+  margin-bottom: calc(var(--zeile) * 3);
+}
+
+.naechstes {
+  margin-top: var(--zeile);
+  font-size: 1.5rem;
+  flex-wrap: wrap;
+}
+.naechstes__label { color: #888; font-size: 0.8em; width: 100%; }
+.naechstes img { width: 50px; transition: transform 0.3s; }
+.naechstes:hover .naechstes__titel { color: var(--rot); }
+.naechstes:hover img { transform: translateX(8px); }
+
 /* ---------- Kleine Bildschirme ---------- */
 
 @media (max-width: 700px) {

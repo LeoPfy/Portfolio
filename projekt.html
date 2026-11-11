@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projekt – Leo Pfyl</title>
+  <link rel="icon" href="assets/img/marke/logo.png">
+  <link rel="preload" href="assets/fonts/permanent-marker.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+  <script>try { if (sessionStorage.getItem("uebergang")) document.documentElement.classList.add("kommt-an"); } catch (e) {}</script>
+</head>
+<body>
+
+  <svg class="filter" aria-hidden="true">
+    <filter id="boil-0"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+    <filter id="boil-1"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+    <filter id="boil-2"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="13"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+  </svg>
+
+  <svg class="uebergang" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <path pathLength="1" d="M-20 -6 L120 -14 L-20 8 L120 0 L-20 22 L120 14 L-20 36 L120 28 L-20 50 L120 42 L-20 64 L120 56 L-20 78 L120 70 L-20 92 L120 84 L-20 106 L120 98 L-20 120 L120 112"/>
+  </svg>
+
+  <nav class="register" aria-label="Hauptnavigation">
+    <a class="lasche" href="index.html">Vorne</a>
+    <a class="lasche ist-aktiv" href="projekte.html">Zeug</a>
+    <a class="lasche" href="index.html#ich">Ich</a>
+    <a class="lasche" href="index.html#post">Post</a>
+  </nav>
+
+  <main class="seite">
+    <!-- Der Inhalt wird aus data/projekte.json gefüllt (projekt.html?p=slug) -->
+    <article class="abschnitt projekt">
+      <a class="zurueck" href="projekte.html">
+        <img src="assets/img/deko/pfeil-einfach.png" alt="">
+        zurück zum Zeug
+      </a>
+
+      <header class="projekt__kopf">
+        <h1 class="notiz projekt__titel"></h1>
+        <p class="projekt__notiz"></p>
+        <dl class="projekt__infos"></dl>
+      </header>
+
+      <figure class="eingeklebt projekt__hauptbild">
+        <img class="klebeband klebeband--links" src="assets/img/deko/klebeband-1.png" alt="">
+        <img class="klebeband klebeband--rechts" src="assets/img/deko/klebeband-3.png" alt="">
+      </figure>
+
+      <div class="projekt__text"></div>
+
+      <div class="projekt__galerie"></div>
+
+      <section class="projekt__skizzen" hidden>
+        <h2 class="notiz">Aus dem Skizzenbuch</h2>
+        <div class="projekt__galerie"></div>
+      </section>
+
+      <a class="naechstes" href="projekte.html">
+        <span class="naechstes__label">Nächstes Projekt</span>
+        <span class="naechstes__titel"></span>
+        <img src="assets/img/deko/pfeil-kringel-1.png" alt="">
+      </a>
+    </article>
+  </main>
+
+  <footer class="fuss">
+    <img class="fuss__figur" src="assets/img/figuren/zeichnend.png" alt="Leo sitzt da und zeichnet">
+    <div class="fuss__text">
+      <p>Diese Seite wurde von Hand gezeichnet.</p>
+      <div class="socials">
+        <a href="https://www.instagram.com/" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
+        <a href="https://www.linkedin.com/" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
+      </div>
+      <p class="fuss__klein">© 2026 Leo Pfyl</p>
+    </div>
+  </footer>
+
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

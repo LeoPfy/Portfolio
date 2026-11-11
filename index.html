@@ -8,6 +8,8 @@
   <link rel="icon" href="assets/img/marke/logo.png">
   <link rel="preload" href="assets/fonts/permanent-marker.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
+  <!-- Kommt man über einen Seitenwechsel, startet die Seite zugekritzelt -->
+  <script>try { if (sessionStorage.getItem("uebergang")) document.documentElement.classList.add("kommt-an"); } catch (e) {}</script>
 </head>
 <body>
 
@@ -18,10 +20,16 @@
     <filter id="boil-2"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="13"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
   </svg>
 
-  <!-- Register-Laschen: die Navigation ragt rechts aus dem Skizzenbuch -->
+  <!-- Kritzel-Übergang zwischen den Seiten -->
+  <svg class="uebergang" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <path pathLength="1" d="M-20 -6 L120 -14 L-20 8 L120 0 L-20 22 L120 14 L-20 36 L120 28 L-20 50 L120 42 L-20 64 L120 56 L-20 78 L120 70 L-20 92 L120 84 L-20 106 L120 98 L-20 120 L120 112"/>
+  </svg>
+
+  <!-- Register-Laschen: die Navigation ragt rechts aus dem Skizzenbuch.
+       data-abschnitt: bei welchem Abschnitt der Startseite die Lasche rot wird -->
   <nav class="register" aria-label="Hauptnavigation">
     <a class="lasche" href="#vorne">Vorne</a>
-    <a class="lasche" href="#zeug">Zeug</a>
+    <a class="lasche" href="projekte.html" data-abschnitt="zeug">Zeug</a>
     <a class="lasche" href="#ich">Ich</a>
     <a class="lasche" href="#post">Post</a>
   </nav>
@@ -76,7 +84,7 @@
         <img class="leine__figur" src="assets/img/figuren/zeigend.png" alt="Leo zeigt nach oben auf die Wäscheleine">
         <div>
           <p class="leine__sprechblase">Das da oben sind meine Lieblinge.<br>Der Rest liegt hier:</p>
-          <a class="knopf" href="#zeug">Mehr Zeug</a>
+          <a class="knopf" href="projekte.html">Mehr Zeug</a>
         </div>
       </div>
     </section>
