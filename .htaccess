@@ -1,0 +1,9 @@
+# Interne Dateien und Ordner nicht ausliefern
+<FilesMatch "^(.*\.md|\.gitignore)$">
+  Require all denied
+</FilesMatch>
+
+RedirectMatch 404 ^/(tools|zeichnungen|\.git|\.github)(/|$)
+
+# Eigene Fehlerseite
+ErrorDocument 404 /404.html

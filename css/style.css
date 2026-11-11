@@ -83,6 +83,7 @@ img { max-width: 100%; display: block; }
 }
 
 .abschnitt {
+  position: relative;
   min-height: 60vh;
   padding: calc(var(--zeile) * 3) 0;
 }
@@ -160,6 +161,66 @@ img { max-width: 100%; display: block; }
   -webkit-mask: url("../assets/img/deko/unterstrich-welle.png") center / 100% 100% no-repeat;
           mask: url("../assets/img/deko/unterstrich-welle.png") center / 100% 100% no-repeat;
 }
+
+/* Die Wellenlinie zeichnet sich von links nach rechts, sobald die Notiz ins Bild kommt */
+html.js .notiz::after {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.7s cubic-bezier(.6, 0, .3, 1) 0.2s;
+}
+html.js .notiz.ist-gezeichnet::after { clip-path: inset(0 0 0 0); }
+
+/* ---------- Randkritzel (zeichnen sich beim Scrollen selbst) ---------- */
+
+.randkritzel {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  aspect-ratio: var(--format);
+  background: var(--rot);
+  /* das Bild selbst steht im HTML (mask-image), damit der Pfad überall stimmt */
+  -webkit-mask-position: center;
+          mask-position: center;
+  -webkit-mask-size: contain;
+          mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  transform: rotate(var(--r, 0deg));
+  pointer-events: none;
+}
+html.js .randkritzel {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.8s cubic-bezier(.6, 0, .3, 1) 0.5s;
+}
+html.js .randkritzel.ist-gezeichnet { clip-path: inset(0 0 0 0); }
+
+/* ---------- Links: Unterstreichung zeichnet sich beim Hover ---------- */
+
+/* (die Daumenkino-Notiz ist schon absolut positioniert und braucht das nicht) */
+.zurueck,
+.naechstes__titel {
+  position: relative;
+}
+.zurueck::after,
+.naechstes__titel::after,
+.daumenkino__notiz.ist-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.45em;
+  height: 0.45em;
+  background: var(--rot);
+  -webkit-mask: url("../assets/img/deko/unterstrich-doppelt.png") center / 100% 100% no-repeat;
+          mask: url("../assets/img/deko/unterstrich-doppelt.png") center / 100% 100% no-repeat;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.4s cubic-bezier(.6, 0, .3, 1);
+}
+.zurueck:hover::after,
+.zurueck:focus-visible::after,
+.naechstes:hover .naechstes__titel::after,
+.naechstes:focus-visible .naechstes__titel::after,
+.daumenkino__notiz.ist-link:hover::after { clip-path: inset(0 0 0 0); }
 
 .platzhalter {
   color: #8a8a8a;
@@ -394,8 +455,8 @@ img { max-width: 100%; display: block; }
 
 .ich {
   display: grid;
-  grid-template-columns: minmax(200px, 340px) 1fr;
-  grid-template-areas: "titel titel" "foto text";
+  grid-template-columns: minmax(200px, 340px) 1fr 180px;
+  grid-template-areas: "titel titel titel" "foto text figur";
   gap: var(--zeile) 3rem;
   align-items: start;
 }
@@ -418,6 +479,50 @@ img { max-width: 100%; display: block; }
   transform: translateX(-50%) rotate(8deg);
 }
 .ich__text { grid-area: text; max-width: 38rem; }
+.ich__figur-box { grid-area: figur; align-self: end; }
+.ich__figur { width: 100%; cursor: pointer; }
+.ich__hinweis {
+  margin: 0;
+  font-family: var(--schrift-hand);
+  color: var(--rot);
+  transform: rotate(-4deg);
+}
+
+/* ---------- Kontakt ("Post") ---------- */
+
+.post__text { margin: 0 0 var(--zeile); }
+
+.post__mail {
+  position: relative;
+  display: inline-block;
+  margin-bottom: calc(var(--zeile) * 2);
+  color: var(--tusche);
+  font-family: var(--schrift-hand);
+  font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+  line-height: calc(var(--zeile) * 2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.post__mail:hover,
+.post__mail:focus-visible { color: var(--rot); }
+/* rote Doppel-Unterstreichung, die sich beim Hover zeichnet */
+.post__mail::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.15em;
+  height: 0.35em;
+  background: var(--rot);
+  -webkit-mask: url("../assets/img/deko/unterstrich-doppelt.png") center / 100% 100% no-repeat;
+          mask: url("../assets/img/deko/unterstrich-doppelt.png") center / 100% 100% no-repeat;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.45s cubic-bezier(.6, 0, .3, 1);
+}
+.post__mail:hover::after,
+.post__mail:focus-visible::after { clip-path: inset(0 0 0 0); }
+
+.socials--gross img { width: 64px; }
 
 /* ---------- Footer ---------- */
 
@@ -435,6 +540,107 @@ img { max-width: 100%; display: block; }
 .socials { display: flex; gap: 1rem; margin: 1rem 0; }
 .socials img { width: 44px; transition: transform 0.25s cubic-bezier(.3, 1.6, .5, 1); }
 .socials a:hover img { transform: rotate(-10deg) scale(1.15); }
+
+/* ---------- Cover: geschlossenes Skizzenbuch ---------- */
+
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  perspective: 2200px;
+  cursor: pointer;
+}
+html.mit-cover .cover { display: flex; }
+html.mit-cover body { overflow: hidden; }
+
+.cover__deckel {
+  position: absolute;
+  inset: 0 var(--register-breite) 0 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+.cover__vorne,
+.cover__innen {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+/* schwarzer Kartonumschlag mit leichter Struktur */
+.cover__vorne {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 30% 20%, rgb(255 255 255 / 0.06), transparent 60%),
+    repeating-linear-gradient(35deg, rgb(255 255 255 / 0.015) 0 2px, transparent 2px 5px),
+    #1c1b19;
+  box-shadow: inset -14px 0 30px rgb(0 0 0 / 0.5), 12px 0 24px rgb(0 0 0 / 0.25);
+  border-radius: 0 10px 10px 0;
+}
+.cover__innen {
+  background: #f2ede0;
+  transform: rotateY(180deg);
+}
+
+.cover__etikett {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.5rem 2.5rem 1.25rem;
+  background: var(--papier);
+  transform: rotate(-2deg);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.4);
+}
+.cover__etikett img { width: 70px; margin-bottom: 0.5rem; }
+.cover__titel { font-family: var(--schrift-hand); font-size: 2rem; line-height: 1.1; }
+.cover__name { font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase; }
+
+/* rotes Gummiband, das das Buch zuhält */
+.cover__gummi {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 12%;
+  width: 14px;
+  background: linear-gradient(90deg, #a51f1a, var(--rot) 40%, #b8241e);
+  box-shadow: 2px 0 6px rgb(0 0 0 / 0.5);
+}
+
+.cover__hinweis {
+  position: absolute;
+  bottom: 2rem;
+  left: calc(50% - var(--register-breite) / 2);
+  transform: translateX(-50%);
+  margin: 0;
+  color: #cfc8b8;
+  font-family: var(--schrift-hand);
+}
+
+/* ---------- Fehlerseite (404) ---------- */
+
+.fehlerseite__kino { width: min(100%, 380px); display: block; margin: var(--zeile) 0 0; }
+.fehlerseite__notiz {
+  margin: 0 0 calc(var(--zeile) * 2);
+  font-family: var(--schrift-hand);
+  font-size: 1.4rem;
+  color: var(--rot);
+  transform: rotate(-3deg);
+}
+
+/* ---------- Tusche-Spur am Mauszeiger ---------- */
+
+.tusche {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 80;              /* über der Seite, unter Cover und Übergang */
+  pointer-events: none;     /* Klicks gehen durch */
+}
 
 /* ---------- Kritzel-Übergang ---------- */
 
@@ -636,7 +842,8 @@ html.kommt-an .uebergang path { stroke-dashoffset: 0; }
     transform: rotate(var(--kipp, 0deg));
   }
 
-  .ich { grid-template-columns: 1fr; grid-template-areas: "titel" "foto" "text"; }
+  .ich { grid-template-columns: 1fr; grid-template-areas: "titel" "foto" "text" "figur"; }
+  .ich__figur { width: 140px; }
   .foto { max-width: 280px; }
 
   .fuss { flex-direction: column; align-items: flex-start; padding-bottom: 5rem; }

@@ -8,8 +8,15 @@
   <link rel="icon" href="assets/img/marke/logo.png">
   <link rel="preload" href="assets/fonts/permanent-marker.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
-  <!-- Kommt man über einen Seitenwechsel, startet die Seite zugekritzelt -->
-  <script>try { if (sessionStorage.getItem("uebergang")) document.documentElement.classList.add("kommt-an"); } catch (e) {}</script>
+  <!-- Kommt man über einen Seitenwechsel, startet die Seite zugekritzelt.
+       Beim ersten Besuch liegt stattdessen das geschlossene Skizzenbuch da. -->
+  <script>
+    document.documentElement.classList.add("js");
+    try {
+      if (sessionStorage.getItem("uebergang")) document.documentElement.classList.add("kommt-an");
+      else if (!sessionStorage.getItem("cover-gesehen")) document.documentElement.classList.add("mit-cover");
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
@@ -19,6 +26,22 @@
     <filter id="boil-1"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
     <filter id="boil-2"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="13"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
   </svg>
+
+  <!-- Cover: das geschlossene Skizzenbuch, klappt beim ersten Besuch auf -->
+  <div class="cover" aria-hidden="true">
+    <div class="cover__deckel">
+      <div class="cover__vorne">
+        <div class="cover__etikett">
+          <img src="assets/img/marke/logo.png" alt="">
+          <span class="cover__titel">Skizzenbuch</span>
+          <span class="cover__name">Leo Pfyl</span>
+        </div>
+        <span class="cover__gummi"></span>
+      </div>
+      <div class="cover__innen"></div>
+    </div>
+    <p class="cover__hinweis">klick zum Aufschlagen</p>
+  </div>
 
   <!-- Kritzel-Übergang zwischen den Seiten -->
   <svg class="uebergang" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -73,6 +96,8 @@
     <!-- Wäscheleine mit den besten Arbeiten. Die Karten kommen aus data/projekte.json (alle mit "leine": true) -->
     <section id="zeug" class="abschnitt leine-abschnitt">
       <h2 class="notiz">Frisch aus dem Heft</h2>
+      <!-- Randkritzel: zeichnet sich beim Scrollen selbst, rot eingefärbt -->
+      <span class="randkritzel" style="-webkit-mask-image: url('assets/img/deko/pfeil-kringel-1.png'); mask-image: url('assets/img/deko/pfeil-kringel-1.png'); --format: 511 / 520; --x: 27rem; --y: 2.5rem; --w: 80px; --r: 95deg"></span>
 
       <div class="leine" aria-label="Ausgewählte Arbeiten – zum Verschieben an der Leine ziehen">
         <svg class="leine__seil" aria-hidden="true"><path /></svg>
@@ -92,6 +117,7 @@
     <!-- Über mich -->
     <section id="ich" class="abschnitt ich">
       <h2 class="notiz">Das bin ich (in echt)</h2>
+      <span class="randkritzel" style="-webkit-mask-image: url('assets/img/deko/doodle-stern.png'); mask-image: url('assets/img/deko/doodle-stern.png'); --format: 242 / 260; --x: 25rem; --y: 2.5rem; --w: 46px; --r: 12deg"></span>
       <figure class="foto">
         <img src="assets/img/foto/leo.jpg" alt="Foto von Leo Pfyl" width="900" height="960">
         <img class="foto__klebeband" src="assets/img/deko/klebeband-2.png" alt="">
@@ -99,6 +125,11 @@
       <div class="ich__text">
         <p>Hoi, ich bin Leo. Ich zeichne eigentlich ständig&nbsp;– und irgendwann fangen die Zeichnungen an, sich zu bewegen.</p>
         <p class="platzhalter">Hier kommt noch ein bisschen mehr über dich hin.</p>
+      </div>
+      <!-- Die gezeichnete Version winkt, wenn man mit der Maus drüberfährt -->
+      <div class="ich__figur-box">
+        <p class="ich__hinweis">der bin auch ich&nbsp;↓</p>
+        <img class="ich__figur" src="assets/img/figuren/hallo/001.png" alt="Gezeichneter Leo, der winkt">
       </div>
     </section>
 
@@ -113,9 +144,20 @@
     </section>
 
     <!-- Kontakt -->
-    <section id="post" class="abschnitt">
+    <section id="post" class="abschnitt post">
       <h2 class="notiz">Schreib mir was rein</h2>
-      <p class="platzhalter">Hier kommt das Kontaktformular hin.</p>
+      <span class="randkritzel" style="-webkit-mask-image: url('assets/img/deko/pfeil-dick.png'); mask-image: url('assets/img/deko/pfeil-dick.png'); --format: 407 / 520; --x: 25rem; --y: 3rem; --w: 54px; --r: 160deg"></span>
+
+      <p class="post__text">Ein Auftrag, eine Idee oder einfach Hallo? Schreib mir:</p>
+
+      <!-- Die Adresse wird erst per JavaScript zusammengesetzt, damit Spam-Bots sie nicht einfach auslesen -->
+      <a class="post__mail" data-name="hallo" data-domain="leopfyl.ch" href="#post">hallo [at] leopfyl.ch</a>
+
+      <p class="post__text">oder find mich hier:</p>
+      <div class="socials socials--gross">
+        <a href="https://www.instagram.com/pfyyl/" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
+        <a href="https://www.linkedin.com/in/leo-pfyl-09a23332b/" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
+      </div>
     </section>
 
   </main>
@@ -125,8 +167,8 @@
     <div class="fuss__text">
       <p>Diese Seite wurde von Hand gezeichnet.</p>
       <div class="socials">
-        <a href="https://www.instagram.com/" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
-        <a href="https://www.linkedin.com/" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
+        <a href="https://www.instagram.com/pfyyl/" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
+        <a href="https://www.linkedin.com/in/leo-pfyl-09a23332b/" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
       </div>
       <p class="fuss__klein">© 2026 Leo Pfyl</p>
     </div>

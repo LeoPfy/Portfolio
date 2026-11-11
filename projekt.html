@@ -7,7 +7,7 @@
   <link rel="icon" href="assets/img/marke/logo.png">
   <link rel="preload" href="assets/fonts/permanent-marker.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
-  <script>try { if (sessionStorage.getItem("uebergang")) document.documentElement.classList.add("kommt-an"); } catch (e) {}</script>
+  <script>document.documentElement.classList.add("js"); try { if (sessionStorage.getItem("uebergang")) document.documentElement.classList.add("kommt-an"); } catch (e) {}</script>
 </head>
 <body>
 
@@ -69,14 +69,15 @@
     <div class="fuss__text">
       <p>Diese Seite wurde von Hand gezeichnet.</p>
       <div class="socials">
-        <a href="https://www.instagram.com/" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
-        <a href="https://www.linkedin.com/" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
+        <a href="https://www.instagram.com/pfyyl/" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/img/marke/instagram.png" alt=""></a>
+        <a href="https://www.linkedin.com/in/leo-pfyl-09a23332b/" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="assets/img/marke/linkedin.png" alt=""></a>
       </div>
       <p class="fuss__klein">© 2026 Leo Pfyl</p>
     </div>
   </footer>
 
   <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

@@ -41,7 +41,7 @@ Die Webseite ist **ein Skizzenbuch, das lebt**: liniertes Papier, eingeklebte Ar
 3. **Zeigende Figur** zeigt auf „Mehr Zeug →“
 4. **Daumenkino** – eine von Leos Procreate-Animationen läuft beim Scrollen Bild für Bild ab (vorwärts und rückwärts)
 5. **„Das bin ich (in echt)“** – echtes Foto, mit Klebeband eingeklebt, ein paar Sätze, daneben die **Hallo-Figur**, die beim Hover winkt
-6. **„Schreib mir was rein“** – Kontaktformular auf liniertem Papier, geht direkt an Leos Mail
+6. **„Schreib mir was rein“** – Mail-Adresse zum Anklicken und Socials (kein Formular)
 7. **Footer** – die **zeichnende Figur** sitzt da und zeichnet, Instagram + LinkedIn (eigenes Social-Zeichen)
 
 ## Projekte-Seite („Zeug“)
@@ -85,10 +85,10 @@ Die zeichnende Figur: „Diese Seite gibt’s noch nicht – ich zeichne sie ger
 |---|---|
 | Seite | HTML, CSS, JavaScript |
 | Animationen | GSAP (inkl. ScrollTrigger) |
-| CMS + Kontaktformular | PHP + MySQL (läuft auf Hostpoint) |
+| CMS | PHP + MySQL (läuft auf Hostpoint) |
 | Versionierung | Git, Commit & Push mit **GitHub Desktop** |
 | Hochladen | GitHub Action lädt bei jedem Push automatisch per SFTP auf Hostpoint |
-| Sicherheit | Zugangsdaten nur als GitHub Secrets bzw. in Config-Dateien ausserhalb des Repos, Passwort nur als Hash, Spamschutz im Formular |
+| Sicherheit | Zugangsdaten nur als GitHub Secrets bzw. in Config-Dateien ausserhalb des Repos, Passwort nur als Hash |
 
 ## Vorerst nicht
 

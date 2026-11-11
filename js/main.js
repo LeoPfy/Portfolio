@@ -26,7 +26,9 @@ function ladeFrames(ordner, anzahl) {
     img.src = `${ordner}/${String(i).padStart(3, "0")}.png`;
     bilder.push(img);
   }
-  return Promise.all(bilder.map((img) => img.decode().catch(() => {}))).then(() => bilder);
+  // Warten, bis jedes Bild geladen ist (oder fehlgeschlagen – dann hängt nichts)
+  const geladen = (img) => img.complete ? Promise.resolve() : new Promise((fertig) => { img.onload = img.onerror = fertig; });
+  return Promise.all(bilder.map(geladen)).then(() => bilder);
 }
 
 // ---------- Der Name zeichnet sich selbst ----------
@@ -53,8 +55,42 @@ async function schriftzug() {
   });
 }
 
+// ---------- Cover ----------
+// Beim ersten Besuch: Gummiband springt weg, der Umschlag klappt nach links auf.
+// Auf Klick sofort, sonst nach einem kurzen Moment von selbst.
+function coverAufklappen() {
+  const html = document.documentElement;
+  if (!html.classList.contains("mit-cover")) return Promise.resolve();
+
+  return new Promise((fertig) => {
+    const cover = document.querySelector(".cover");
+    let offen = false;
+    const oeffnen = () => {
+      if (offen) return;
+      offen = true;
+      try { sessionStorage.setItem("cover-gesehen", "1"); } catch (_) {}
+      gsap.timeline({
+        onComplete: () => {
+          html.classList.remove("mit-cover");
+          fertig();
+        },
+      })
+        .to(".cover__hinweis", { opacity: 0, duration: 0.2 })
+        .to(".cover__gummi", { x: 60, rotation: 25, opacity: 0, duration: 0.35, ease: "back.in(2)" }, 0)
+        .to(".cover__deckel", { rotationY: -165, duration: 1.1, ease: "power2.inOut" }, 0.25)
+        .to(cover, { opacity: 0, duration: 0.3 }, "-=0.3");
+      // Sicherheitsnetz, falls der Browser Animationen pausiert
+      setTimeout(() => { html.classList.remove("mit-cover"); fertig(); }, 2500);
+    };
+    cover.addEventListener("click", oeffnen);
+    addEventListener("keydown", oeffnen, { once: true });
+    setTimeout(oeffnen, 1400);
+  });
+}
+
 // ---------- Startseite: Ablauf ----------
 async function intro() {
+  await coverAufklappen();
   await schriftzug();
 
   gsap.to(".vorne__untertitel", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
@@ -487,15 +523,191 @@ function uebergaenge() {
   });
 }
 
+// ---------- Winkende Figur ----------
+// Tauscht im <img> die 6 Hallo-Frames durch. Das erste Frame ist sofort
+// sichtbar (steht im HTML), die anderen werden im Hintergrund vorgeladen.
+function winkFigur(img) {
+  const ordner = "assets/img/figuren/hallo";
+  const quellen = [1, 2, 3, 4, 5, 6].map((n) => `${ordner}/${String(n).padStart(3, "0")}.png`);
+  quellen.forEach((src) => (new Image().src = src));
+
+  let timer = null;
+  let i = 0;
+  const figur = {
+    start() {
+      if (timer) return;
+      timer = setInterval(() => (img.src = quellen[(i = (i + 1) % quellen.length)]), 1000 / 13);   // 13 fps wie in Procreate
+    },
+    stopp() {
+      clearInterval(timer);
+      timer = null;
+      i = 0;
+      img.src = quellen[0];
+    },
+    // ein paar Mal winken und wieder aufhören
+    winken(dauer = 2000) {
+      figur.start();
+      setTimeout(figur.stopp, dauer);
+    },
+  };
+  return figur;
+}
+
+function ichFigur() {
+  const img = document.querySelector(".ich__figur");
+  const figur = winkFigur(img);
+  img.addEventListener("pointerenter", figur.start);
+  img.addEventListener("pointerleave", figur.stopp);
+  img.addEventListener("click", () => figur.winken(1500));   // Handy: antippen
+
+  // Winkt von selbst, sobald man zum ersten Mal hinscrollt
+  new IntersectionObserver(([e], beobachter) => {
+    if (!e.isIntersecting) return;
+    figur.winken(2200);
+    beobachter.disconnect();
+  }, { threshold: 0.6 }).observe(img);
+}
+
+// ---------- Mail-Adresse ----------
+// Im HTML steht die Adresse nur zerlegt (data-name, data-domain), damit
+// Spam-Bots sie nicht einfach auslesen. Hier wird der echte Link gebaut.
+function mailLink() {
+  document.querySelectorAll(".post__mail").forEach((link) => {
+    const adresse = `${link.dataset.name}@${link.dataset.domain}`;
+    link.href = `mailto:${adresse}`;
+    link.textContent = adresse;
+  });
+}
+
+// ---------- Tusche-Spur am Mauszeiger ----------
+// Der Mauszeiger zieht eine Tuschelinie hinter sich her, die langsam verblasst.
+// Langsam bewegen = dicker Strich, schnell = dünn, wie bei einem Pinselstift.
+function tuscheSpur() {
+  // nur mit echter Maus, nicht auf Touch-Geräten
+  if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+  const canvas = document.createElement("canvas");
+  canvas.className = "tusche";
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.append(canvas);
+  const ctx = canvas.getContext("2d");
+
+  const LEBENSDAUER = 700;   // ms, bis ein Stück der Linie verschwunden ist
+  let punkte = [];
+  let laeuft = false;
+
+  function groesse() {
+    const dpr = devicePixelRatio || 1;
+    canvas.width = innerWidth * dpr;
+    canvas.height = innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  groesse();
+  addEventListener("resize", groesse);
+
+  addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const letzter = punkte[punkte.length - 1];
+    const jetzt = performance.now();
+    const tempo = letzter ? Math.hypot(e.clientX - letzter.x, e.clientY - letzter.y) / Math.max(1, jetzt - letzter.t) : 0;
+    punkte.push({ x: e.clientX, y: e.clientY, t: jetzt, breite: Math.max(0.8, 3.2 - tempo * 1.2) });
+    if (!laeuft) {
+      laeuft = true;
+      requestAnimationFrame(zeichnen);
+    }
+  }, { passive: true });
+
+  // Verlässt die Maus das Fenster, soll die Linie nicht quer zum Wiedereinstieg springen
+  document.documentElement.addEventListener("mouseleave", () => punkte.push(null));
+
+  function zeichnen() {
+    const jetzt = performance.now();
+    punkte = punkte.filter((p) => p === null || jetzt - p.t < LEBENSDAUER);
+    while (punkte[0] === null) punkte.shift();   // Lücken am Anfang braucht es nicht mehr
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.lineCap = "round";
+    for (let i = 1; i < punkte.length; i++) {
+      const a = punkte[i - 1], b = punkte[i];
+      if (!a || !b) continue;
+      const alter = (jetzt - b.t) / LEBENSDAUER;
+      ctx.strokeStyle = `rgba(26, 26, 26, ${0.55 * (1 - alter)})`;
+      ctx.lineWidth = b.breite * (1 - alter * 0.6);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+    if (punkte.some(Boolean)) requestAnimationFrame(zeichnen);
+    else {
+      punkte = [];
+      laeuft = false;
+    }
+  }
+}
+
+// ---------- Kritzeleien zeichnen sich selbst ----------
+// Unterstreichungen der Notizen und Randkritzel werden gezeichnet,
+// sobald sie ins Bild kommen.
+function kritzeln() {
+  // Bewusst über die Position im Fenster und nicht mit IntersectionObserver:
+  // die Randkritzel sind per clip-path unsichtbar und würden sonst nie "gesehen".
+  const offen = new Set(document.querySelectorAll(".notiz, .randkritzel"));
+  function pruefen() {
+    offen.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < innerHeight * 0.85 && r.bottom > 0) {
+        el.classList.add("ist-gezeichnet");
+        offen.delete(el);
+      }
+    });
+    if (!offen.size) removeEventListener("scroll", pruefen);
+  }
+  addEventListener("scroll", pruefen, { passive: true });
+  pruefen();
+}
+
+// ---------- Bilder werden hingeklebt ----------
+// Beim Scrollen fallen Bilder leicht schräg aufs Papier, dann klatscht das Klebeband drauf.
+function hinkleben() {
+  gsap.registerPlugin(ScrollTrigger);
+  document.querySelectorAll(".foto, .zettel, .eingeklebt:not(.zettel__bild)").forEach((el) => {
+    const band = el.querySelectorAll(".klebeband, .foto__klebeband");
+    gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } })
+      .from(el, { y: -50, rotation: 9, scale: 1.08, opacity: 0, duration: 0.6, ease: "back.out(1.4)" })
+      .from(band, { scale: 1.8, opacity: 0, duration: 0.25, ease: "power4.in" }, "-=0.1");
+  });
+}
+
+// ---------- Fehlerseite: Animation in Endlosschleife ----------
+async function fehlerKino() {
+  const canvas = document.querySelector(".fehlerseite__kino");
+  const ctx = canvas.getContext("2d");
+  const frames = await ladeFrames(canvas.dataset.frames, Number(canvas.dataset.anzahl));
+  canvas.width = frames[0].naturalWidth;
+  canvas.height = frames[0].naturalHeight;
+  let i = 0;
+  setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(frames[i], 0, 0);
+    i = (i + 1) % frames.length;
+  }, 1000 / Number(canvas.dataset.fps));
+}
+
 // ---------- Start ----------
 lineBoil();
 uebergaenge();
+kritzeln();
+tuscheSpur();
+if (document.querySelector(".fehlerseite__kino")) fehlerKino();
 
 if (document.querySelector(".schriftzug")) {
   waescheleine();
   daumenkinos();
   aktiveLasche();
   intro();
+  ichFigur();
+  mailLink();
+  hinkleben();
   // Sprung auf einen Abschnitt (z. B. index.html#post): erst springen,
   // wenn ScrollTrigger die Daumenkinos fertig eingerichtet hat
   if (location.hash) {
@@ -507,6 +719,6 @@ if (document.querySelector(".schriftzug")) {
 }
 if (document.querySelector(".zeug__liste")) {
   gsap.registerPlugin(Flip);
-  projektListe();
+  projektListe().then(hinkleben);
 }
-if (document.querySelector(".projekt")) projektDetail();
+if (document.querySelector(".projekt")) projektDetail().then(hinkleben);
