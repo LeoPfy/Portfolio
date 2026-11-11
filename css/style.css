@@ -232,6 +232,58 @@ img { max-width: 100%; display: block; }
 }
 .scroll-hinweis img { width: 48px; transform: rotate(150deg); filter: url(#boil-0); }
 
+/* ---------- Daumenkino ---------- */
+
+.daumenkino__buehne {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.daumenkino__canvas {
+  width: min(100%, 900px);
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.daumenkino__notiz {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  margin: 0;
+  color: var(--rot);
+  font-family: var(--schrift-hand);
+  font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(var(--r)) scale(0.6);
+  transition: opacity 0.2s, transform 0.35s cubic-bezier(.3, 1.8, .5, 1);
+}
+.daumenkino__notiz.ist-sichtbar {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(var(--r)) scale(1);
+}
+.daumenkino__notiz.ist-gross { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+
+.daumenkino__notiz.ist-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--tusche);
+  text-decoration: none;
+}
+.daumenkino__notiz.ist-link.ist-sichtbar { pointer-events: auto; }
+.daumenkino__notiz.ist-link img {
+  width: 56px;
+  transform: rotate(130deg);
+  transition: transform 0.3s;
+}
+.daumenkino__notiz.ist-link:hover img { transform: rotate(130deg) translate(-6px, -6px); }
+
 /* ---------- Über mich ---------- */
 
 .ich {

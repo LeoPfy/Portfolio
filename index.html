@@ -41,10 +41,25 @@
       <img class="doodle" src="assets/img/deko/doodle-blitz.png" alt="" style="--x: 86%; --y: 74%; --r: 8deg; --w: 50px">
       <img class="doodle" src="assets/img/deko/doodle-kirschen.png" alt="" style="--x: 6%; --y: 80%; --r: -6deg; --w: 70px">
 
-      <a class="scroll-hinweis" href="#zeug">
+      <a class="scroll-hinweis" href="#nase">
         <img src="assets/img/deko/pfeil-kringel-2.png" alt="">
         <span>runter&nbsp;scrollen</span>
       </a>
+    </section>
+
+    <!-- Daumenkino 1: Scrollen spielt die Animation Bild für Bild ab.
+         data-von / data-bis: zwischen welchem Fortschritt (0 bis 1) eine Notiz zu sehen ist -->
+    <section id="nase" class="daumenkino" data-frames="assets/img/daumenkino/nase" data-anzahl="90" data-strecke="220">
+      <div class="daumenkino__buehne">
+        <canvas class="daumenkino__canvas" role="img" aria-label="Animation: Eine Figur schnüffelt, ihre Nase wird immer grösser, ploppt ab und rennt davon."></canvas>
+        <p class="daumenkino__notiz" data-von="0.05" data-bis="0.45" style="--x: 58%; --y: 18%; --r: 6deg">*schnüff schnüff*</p>
+        <p class="daumenkino__notiz" data-von="0.5" data-bis="0.72" style="--x: 70%; --y: 30%; --r: -8deg">Hä?!</p>
+        <p class="daumenkino__notiz ist-gross" data-von="0.74" data-bis="0.88" style="--x: 72%; --y: 38%; --r: 10deg">PLOPP!</p>
+        <a class="daumenkino__notiz ist-link" href="#zeug" data-von="0.9" data-bis="1.01" style="--x: 68%; --y: 78%; --r: -3deg">
+          Folg der Nase
+          <img src="assets/img/deko/pfeil-einfach.png" alt="">
+        </a>
+      </div>
     </section>
 
     <!-- Wäscheleine mit den besten Arbeiten (kommt im naechsten Schritt) -->
@@ -52,11 +67,6 @@
       <h2 class="notiz">Frisch aus dem Heft</h2>
       <p class="platzhalter">Hier kommt die Wäscheleine mit den besten Arbeiten hin.</p>
       <a class="knopf" href="#zeug">Mehr Zeug</a>
-    </section>
-
-    <!-- Daumenkino (kommt spaeter) -->
-    <section id="daumenkino" class="abschnitt">
-      <p class="platzhalter">Hier kommt das Daumenkino hin.</p>
     </section>
 
     <!-- Über mich -->
@@ -69,6 +79,16 @@
       <div class="ich__text">
         <p>Hoi, ich bin Leo. Ich zeichne eigentlich ständig&nbsp;– und irgendwann fangen die Zeichnungen an, sich zu bewegen.</p>
         <p class="platzhalter">Hier kommt noch ein bisschen mehr über dich hin.</p>
+      </div>
+    </section>
+
+    <!-- Daumenkino 2: führt zum Kontaktformular -->
+    <section id="glas" class="daumenkino" data-frames="assets/img/daumenkino/glas" data-anzahl="75" data-strecke="200">
+      <div class="daumenkino__buehne">
+        <canvas class="daumenkino__canvas" role="img" aria-label="Animation: Eine Figur schnüffelt und fliegt ihrer Nase hinterher, direkt gegen ein Glas mit einer Blume."></canvas>
+        <p class="daumenkino__notiz" data-von="0.05" data-bis="0.5" style="--x: 22%; --y: 10%; --r: -5deg">Was riecht da so gut?</p>
+        <p class="daumenkino__notiz ist-gross" data-von="0.6" data-bis="0.82" style="--x: 50%; --y: 12%; --r: 8deg">WUSCH!</p>
+        <p class="daumenkino__notiz" data-von="0.86" data-bis="1.01" style="--x: 60%; --y: 92%; --r: -4deg">Autsch. Schreib mir lieber.</p>
       </div>
     </section>
 

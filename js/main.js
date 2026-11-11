@@ -67,24 +67,79 @@ async function intro() {
   gsap.to(".scroll-hinweis", { opacity: 1, duration: 0.6, delay: 0.8 });
 }
 
+// ---------- Daumenkino ----------
+// Die Bühne bleibt stehen (pin), während man scrollt. Der Scroll-Fortschritt
+// bestimmt, welches Frame gezeigt wird – vorwärts wie rückwärts.
+function daumenkinos() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll(".daumenkino").forEach((kino) => {
+    const buehne = kino.querySelector(".daumenkino__buehne");
+    const canvas = kino.querySelector(".daumenkino__canvas");
+    const ctx = canvas.getContext("2d");
+    const notizen = kino.querySelectorAll(".daumenkino__notiz");
+    const anzahl = Number(kino.dataset.anzahl);
+    let frames = null;
+    let fortschritt = 0;
+
+    function zeichne() {
+      // Notizen ein- und ausblenden
+      notizen.forEach((n) => {
+        const sichtbar = fortschritt >= Number(n.dataset.von) && fortschritt < Number(n.dataset.bis);
+        n.classList.toggle("ist-sichtbar", sichtbar);
+      });
+      if (!frames) return;
+      const i = Math.round(fortschritt * (anzahl - 1));
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(frames[i], 0, 0);
+    }
+
+    // Frames erst laden, wenn das Daumenkino in die Nähe kommt
+    ScrollTrigger.create({
+      trigger: kino,
+      start: "top bottom+=100%",
+      once: true,
+      onEnter: async () => {
+        frames = await ladeFrames(kino.dataset.frames, anzahl);
+        canvas.width = frames[0].naturalWidth;
+        canvas.height = frames[0].naturalHeight;
+        zeichne();
+      },
+    });
+
+    ScrollTrigger.create({
+      trigger: kino,
+      start: "top top",
+      end: `+=${kino.dataset.strecke}%`,
+      pin: buehne,
+      scrub: true,
+      onUpdate: (st) => {
+        fortschritt = st.progress;
+        zeichne();
+      },
+    });
+  });
+}
+
 // ---------- Aktive Register-Lasche ----------
 // Die Lasche des Abschnitts, der gerade zu sehen ist, wird rot.
 function aktiveLasche() {
   const laschen = document.querySelectorAll(".lasche");
   const abschnitte = [...laschen].map((l) => document.querySelector(l.getAttribute("href")));
 
-  const beobachter = new IntersectionObserver(
-    (eintraege) => {
-      eintraege.forEach((e) => {
-        if (!e.isIntersecting) return;
-        laschen.forEach((l) => l.classList.toggle("ist-aktiv", l.getAttribute("href") === `#${e.target.id}`));
-      });
-    },
-    { rootMargin: "-45% 0px -45% 0px" }
-  );
-  abschnitte.forEach((a) => a && beobachter.observe(a));
+  // Aktiv ist der letzte Abschnitt, dessen Anfang schon über der Bildschirmmitte liegt
+  function aktualisieren() {
+    let aktiv = abschnitte[0];
+    abschnitte.forEach((a) => {
+      if (a && a.getBoundingClientRect().top < innerHeight / 2) aktiv = a;
+    });
+    laschen.forEach((l) => l.classList.toggle("ist-aktiv", l.getAttribute("href") === `#${aktiv.id}`));
+  }
+  addEventListener("scroll", aktualisieren, { passive: true });
+  aktualisieren();
 }
 
 lineBoil();
+daumenkinos();
 aktiveLasche();
 intro();
