@@ -232,6 +232,112 @@ img { max-width: 100%; display: block; }
 }
 .scroll-hinweis img { width: 48px; transform: rotate(150deg); filter: url(#boil-0); }
 
+/* ---------- Wäscheleine ---------- */
+
+.leine {
+  --hoehe: 26rem;
+  position: relative;
+  height: var(--hoehe);
+  margin: 0 -2rem;              /* bis an den Seitenrand */
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;          /* senkrecht scrollen bleibt möglich */
+  user-select: none;
+}
+.leine.ist-gezogen { cursor: grabbing; }
+
+.leine__seil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: url(#boil-0);
+}
+.leine__seil path {
+  fill: none;
+  stroke: var(--tusche);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.leine__spur {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.karte {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 180px;
+  transform-origin: 50% 0;      /* dreht sich um die Klammer */
+  will-change: transform;
+}
+.karte a {
+  display: block;
+  padding: 0.6rem 0.6rem 0.4rem;
+  background: #fff;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.14);
+  color: var(--tusche);
+  text-decoration: none;
+  -webkit-user-drag: none;
+}
+.karte__bild {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: var(--papier);
+  pointer-events: none;
+}
+.karte__titel {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--schrift-hand);
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+.karte__notiz {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: #666;
+}
+.karte__klammer {
+  position: absolute;
+  top: -1.4rem;
+  left: 50%;
+  width: 26px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+.karte a:hover,
+.karte a:focus-visible { outline: 3px solid var(--rot); outline-offset: 2px; }
+
+.leine__hinweis {
+  margin: 0;
+  text-align: center;
+  font-family: var(--schrift-hand);
+  color: #888;
+}
+
+.leine__fuss {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-top: var(--zeile);
+}
+.leine__figur { width: 110px; }
+.leine__sprechblase {
+  margin: 0 0 1rem;
+  font-family: var(--schrift-hand);
+  font-size: 1.25rem;
+  line-height: 1.4;
+  transform: rotate(-2deg);
+}
+
 /* ---------- Daumenkino ---------- */
 
 .daumenkino__buehne {

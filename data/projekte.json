@@ -1,0 +1,56 @@
+[
+  {
+    "slug": "nase",
+    "titel": "Die Nase",
+    "notiz": "die Nase haut ab",
+    "kategorie": "Animation",
+    "jahr": 2026,
+    "bild": "assets/img/daumenkino/nase/062.png",
+    "leine": true
+  },
+  {
+    "slug": "glas",
+    "titel": "Ab ins Glas",
+    "notiz": "immer der Nase nach",
+    "kategorie": "Animation",
+    "jahr": 2026,
+    "bild": "assets/img/daumenkino/glas/055.png",
+    "leine": true
+  },
+  {
+    "slug": "hallo",
+    "titel": "Hallo!",
+    "notiz": "das bin ich, gezeichnet",
+    "kategorie": "Illustration",
+    "jahr": 2026,
+    "bild": "assets/img/figuren/hallo/003.png",
+    "leine": true
+  },
+  {
+    "slug": "kacke",
+    "titel": "Volltreffer",
+    "notiz": "rastet komplett aus",
+    "kategorie": "Animation",
+    "jahr": 2026,
+    "bild": "assets/img/daumenkino/kacke/040.png",
+    "leine": true
+  },
+  {
+    "slug": "zeichnen",
+    "titel": "Am Kritzeln",
+    "notiz": "Zunge raus, volle Konzentration",
+    "kategorie": "Illustration",
+    "jahr": 2026,
+    "bild": "assets/img/figuren/zeichnend.png",
+    "leine": true
+  },
+  {
+    "slug": "logo",
+    "titel": "Mein Zeichen",
+    "notiz": "Logo, von Hand",
+    "kategorie": "Plakate",
+    "jahr": 2026,
+    "bild": "assets/img/marke/logo.png",
+    "leine": true
+  }
+]

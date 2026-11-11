@@ -62,11 +62,23 @@
       </div>
     </section>
 
-    <!-- Wäscheleine mit den besten Arbeiten (kommt im naechsten Schritt) -->
-    <section id="zeug" class="abschnitt">
+    <!-- Wäscheleine mit den besten Arbeiten. Die Karten kommen aus data/projekte.json (alle mit "leine": true) -->
+    <section id="zeug" class="abschnitt leine-abschnitt">
       <h2 class="notiz">Frisch aus dem Heft</h2>
-      <p class="platzhalter">Hier kommt die Wäscheleine mit den besten Arbeiten hin.</p>
-      <a class="knopf" href="#zeug">Mehr Zeug</a>
+
+      <div class="leine" aria-label="Ausgewählte Arbeiten – zum Verschieben an der Leine ziehen">
+        <svg class="leine__seil" aria-hidden="true"><path /></svg>
+        <ul class="leine__spur"></ul>
+      </div>
+      <p class="leine__hinweis">← an der Leine ziehen →</p>
+
+      <div class="leine__fuss">
+        <img class="leine__figur" src="assets/img/figuren/zeigend.png" alt="Leo zeigt nach oben auf die Wäscheleine">
+        <div>
+          <p class="leine__sprechblase">Das da oben sind meine Lieblinge.<br>Der Rest liegt hier:</p>
+          <a class="knopf" href="#zeug">Mehr Zeug</a>
+        </div>
+      </div>
     </section>
 
     <!-- Über mich -->

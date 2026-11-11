@@ -67,6 +67,151 @@ async function intro() {
   gsap.to(".scroll-hinweis", { opacity: 1, duration: 0.6, delay: 0.8 });
 }
 
+// ---------- Wäscheleine ----------
+// Die Karten hängen an einer durchhängenden Leine und schaukeln wie ein Pendel.
+// Anstösse kommen von der Maus, vom Ziehen an der Leine und vom Scrollen.
+async function waescheleine() {
+  const leine = document.querySelector(".leine");
+  const spur = leine.querySelector(".leine__spur");
+  const seil = leine.querySelector(".leine__seil path");
+
+  const projekte = (await fetch("data/projekte.json").then((r) => r.json())).filter((p) => p.leine);
+
+  const ABSTAND = 240;        // Abstand zwischen den Karten
+  const DURCHHANG = 70;       // wie tief die Leine in der Mitte hängt
+  const OBEN = 40;            // Höhe der Leine an den Enden
+
+  const karten = projekte.map((p, i) => {
+    const li = document.createElement("li");
+    li.className = "karte";
+    li.innerHTML = `
+      <img class="karte__klammer" src="assets/img/deko/klammer-${(i % 2) + 1}.png" alt="">
+      <a href="#zeug" draggable="false">
+        <img class="karte__bild" src="${p.bild}" alt="" draggable="false">
+        <span class="karte__titel">${p.titel}</span>
+        <span class="karte__notiz">${p.notiz}</span>
+      </a>`;
+    spur.append(li);
+    return { el: li, x: i * ABSTAND, winkel: (Math.random() - 0.5) * 20, tempo: 0 };
+  });
+
+  let breite = leine.clientWidth;
+  const spurBreite = (karten.length - 1) * ABSTAND;
+  let verschiebung = 0;       // wie weit die Leine seitlich gezogen ist
+  let schwung = 0;            // Tempo beim Loslassen (läuft aus)
+  let zieht = false;
+
+  // Startposition: Karten mittig, wenn sie Platz haben, sonst am linken Rand
+  const minVerschiebung = () => Math.min(80, breite - spurBreite - 120);
+  const maxVerschiebung = () => Math.max(120, (breite - spurBreite) / 2);
+  verschiebung = spurBreite < breite - 200 ? (breite - spurBreite) / 2 : 110;
+
+  // Höhe der Leine an einer Stelle x (Parabel)
+  const seilY = (x) => {
+    const t = Math.min(1, Math.max(0, x / breite));
+    return OBEN + DURCHHANG * 4 * t * (1 - t);
+  };
+
+  function seilZeichnen() {
+    seil.setAttribute("d", `M -10 ${OBEN} Q ${breite / 2} ${OBEN + DURCHHANG * 2} ${breite + 10} ${OBEN}`);
+  }
+
+  // Ziehen an der Leine
+  let startX = 0, letztesX = 0, letzteZeit = 0, gezogenWeit = false;
+  leine.addEventListener("pointerdown", (e) => {
+    zieht = true;
+    gezogenWeit = false;
+    startX = letztesX = e.clientX;
+    letzteZeit = performance.now();
+    schwung = 0;
+    leine.setPointerCapture(e.pointerId);
+    leine.classList.add("ist-gezogen");
+  });
+  leine.addEventListener("pointermove", (e) => {
+    const dx = e.clientX - letztesX;
+    if (zieht) {
+      const jetzt = performance.now();
+      verschiebung += dx;
+      schwung = dx / Math.max(1, jetzt - letzteZeit) * 16;
+      letzteZeit = jetzt;
+      if (Math.abs(e.clientX - startX) > 5) gezogenWeit = true;
+      karten.forEach((k) => (k.tempo -= dx * 0.6));
+    } else {
+      // Maus streift die Karten: die in der Nähe bekommen einen Schubs
+      const rand = leine.getBoundingClientRect().left;
+      karten.forEach((k) => {
+        const abstand = Math.abs(rand + k.x + verschiebung - e.clientX);
+        if (abstand < 110) k.tempo += dx * 0.5 * (1 - abstand / 110);
+      });
+    }
+    letztesX = e.clientX;
+  });
+  const loslassen = () => {
+    zieht = false;
+    leine.classList.remove("ist-gezogen");
+  };
+  leine.addEventListener("pointerup", loslassen);
+  leine.addEventListener("pointercancel", loslassen);
+  // Nach dem Ziehen soll kein Link aufgehen
+  leine.addEventListener("click", (e) => { if (gezogenWeit) e.preventDefault(); }, true);
+
+  // Mit der Tastatur zu einer Karte springen: Leine so schieben, dass sie sichtbar ist
+  karten.forEach((k) => {
+    k.el.querySelector("a").addEventListener("focus", () => {
+      leine.scrollLeft = 0;
+      if (k.x + verschiebung < 100 || k.x + verschiebung > breite - 100) {
+        verschiebung = breite / 2 - k.x;
+      }
+    });
+  });
+
+  // Scrollen schaukelt die Karten ein wenig
+  let letzterScroll = scrollY;
+  addEventListener("scroll", () => {
+    const d = Math.max(-30, Math.min(30, scrollY - letzterScroll));   // Sprünge (z. B. Laschen-Klick) nicht übertreiben
+    letzterScroll = scrollY;
+    karten.forEach((k, i) => (k.tempo += d * (i % 2 ? 0.25 : -0.25)));
+  }, { passive: true });
+
+  addEventListener("resize", () => {
+    breite = leine.clientWidth;
+    seilZeichnen();
+  });
+
+  // Physik: jede Karte ist ein gedämpftes Pendel
+  let sichtbar = false;
+  new IntersectionObserver(([e]) => (sichtbar = e.isIntersecting)).observe(leine);
+
+  let vorher = performance.now();
+  function schritt(jetzt) {
+    const dt = Math.min(0.05, (jetzt - vorher) / 1000);
+    vorher = jetzt;
+
+    if (!zieht) {
+      verschiebung += schwung;
+      schwung *= 0.92;
+      // Am Ende der Leine sanft zurückfedern
+      const min = minVerschiebung(), max = maxVerschiebung();
+      if (verschiebung < min) verschiebung += (min - verschiebung) * 0.15;
+      if (verschiebung > max) verschiebung += (max - verschiebung) * 0.15;
+    }
+
+    if (sichtbar) {
+      karten.forEach((k) => {
+        const beschleunigung = -60 * k.winkel - 3.2 * k.tempo;
+        k.tempo += beschleunigung * dt;
+        k.winkel += k.tempo * dt;
+        k.winkel = Math.max(-50, Math.min(50, k.winkel));
+        const x = k.x + verschiebung;
+        k.el.style.transform = `translate(${x - 90}px, ${seilY(x) + 4}px) rotate(${k.winkel}deg)`;
+      });
+    }
+    requestAnimationFrame(schritt);
+  }
+  seilZeichnen();
+  requestAnimationFrame(schritt);
+}
+
 // ---------- Daumenkino ----------
 // Die Bühne bleibt stehen (pin), während man scrollt. Der Scroll-Fortschritt
 // bestimmt, welches Frame gezeigt wird – vorwärts wie rückwärts.
@@ -140,6 +285,7 @@ function aktiveLasche() {
 }
 
 lineBoil();
+waescheleine();
 daumenkinos();
 aktiveLasche();
 intro();
